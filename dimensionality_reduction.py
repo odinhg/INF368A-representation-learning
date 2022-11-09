@@ -46,18 +46,18 @@ if __name__ == "__main__":
     s = ax[0].scatter(df_projection_test[:,0], df_projection_test[:,1], c=df_test.label_idx, s=5)
     ax[0].set_aspect("equal", "datalim")
     ax[0].set_title("UMAP (embedded test data)")
-    ax[0].legend(handles=s.legend_elements()[0], labels=class_names)
+    #ax[0].legend(handles=s.legend_elements()[0], labels=class_names)
     s = ax[1].scatter(df_projection_train[:,0], df_projection_train[:,1], c=df_train.label_idx, s=5)
     ax[1].set_aspect("equal", "datalim")
     ax[1].set_title("UMAP (embedded train data)")
-    ax[1].legend(handles=s.legend_elements()[0], labels=class_names)
+    #ax[1].legend(handles=s.legend_elements()[0], labels=class_names)
     s = ax[2].scatter(df_projection_unseen[:,0], df_projection_unseen[:,1], c=df_unseen.label_idx, s=5)
     ax[2].set_aspect("equal", "datalim")
     ax[2].set_title("UMAP (embedded unseen classes)")
-    ax[2].legend(handles=s.legend_elements()[0], labels=class_names_unseen)
+    #ax[2].legend(handles=s.legend_elements()[0], labels=class_names_unseen)
     fig.tight_layout()
     plt.savefig(join(figs_path, "umap_embeddings.png"))
-    
+    """ 
     # The following code is a bit messy, and will probably never get cleaned up. So sorry about that.
     # Find samples closest to and furthest away from class center
     dataset = FlowCamDataSet(class_names, image_size)
@@ -100,5 +100,5 @@ if __name__ == "__main__":
         image = torch.cat([header_text, in_class_images[i], other_class_images[i]], dim=1)
         image = F.to_pil_image(image)
         image.save(join(figs_path, f"close_faraway_closeotherclass_class_{i}.png"))
-
+    """
         
