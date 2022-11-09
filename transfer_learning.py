@@ -32,7 +32,7 @@ if __name__ == "__main__":
     linear_accuracies = []
     knn_accuracies = []
 
-    sample_range = chain(range(30, 100, 10), range(100, 1000, 100), range(1000, len(train_embeddings), 200))
+    sample_range = chain(range(20, 100, 20), range(100, 2000, 200), range(1000, len(train_embeddings), 1000))
     #for ratio in tqdm([x/20 for x in range(1,20)]):
     for n in tqdm(list(sample_range)):
         # Fit models

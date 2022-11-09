@@ -21,9 +21,12 @@ while not (0 <= idx < len(configfiles)):
 exec(f"from configs.{configfiles[idx]} import *") #Ugly, but it works for now.
 
 # Classes to use for training and unseen classes
-class_names_all = ["chainthin", "darksphere", "Rhabdonellidae", "Odontella", "Codonellopsis", "Neoceratium", "Retaria", "Thalassionematales", "Chaetoceros"]
-class_idx = [0, 1, 2, 3, 4, 5] 
-class_idx_unseen = [6, 7, 8]
+class_names_all = ['Eutintinnus', 'Rhabdonellidae', 'Rhizosoleniaceae', 'Undellidae', 'Odontella', 'Thalassionematales', 'Planktoniella sol', 'Dinophyceae', 'pennate', 'badfocus', 'other<living', 'chainthin', 'Steenstrupiella', 'Bacillariophyceae', 'darkrods', 'Codonellopsis', 'Neoceratium pentagonum', 'cyano a', 'Rhizosolenia inter. Richelia', 'Nassellaria', 'Neoceratium fusus', 'part<Odontella', 'Ditylum', 'part<Crustacea', 'lightrods', 'darksphere', 'Bacteriastrum', 'nauplii', 'Richelia', 'Climacodium', 'Retaria', 'ball_bearing_like', 'Neoceratium', 'chainlarge', 'Melosiraceae', 'contrasted_blob', 'artefact', 'part<Ditylum', 'crumple sphere', 'Protoperidinium', 'Coscinodiscaceae', 'Tintinnina', 'UCYNA like', 'Chaetoceros']
+
+number_of_classes_total = len(class_names_all)
+number_of_unseen_classes = 10 # Set the number of classes we exclude from training
+class_idx = list(range(0, number_of_classes_total - number_of_unseen_classes))
+class_idx_unseen = list(range(number_of_classes_total - number_of_unseen_classes, number_of_classes_total))
 class_names = [class_names_all[i] for i in class_idx]
 class_names_unseen = [class_names_all[i] for i in class_idx_unseen]
 number_of_classes = len(class_names)
