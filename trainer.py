@@ -17,15 +17,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 
-# Lots of repeating code here...
-# TODO: Create a universal BaseTrainer class
-# Split into train step, validation step, etc.
-# Train a simple linear classifier on non-classifier-based methods to evaluate performance
-# For classifier-based methods (softmax and arcface), just use the class. head to evaluate.
-# NOTE: Switch to linear-classifier-on-embeddings for validation accuracy for ALL models!
-# Also, train_history should be the same (but can have empty lists for some keys)
-# Let the plot function determine how to plot things depending on what it gets
-
 class BaseTrainer:
     def __init__(self, model, train_dataloader, val_dataloader, loss_function, optimizer, max_epochs, device):
         self.model = model
@@ -38,9 +29,11 @@ class BaseTrainer:
         self.val_steps = len(self.train_dataloader) // 5
         self.early_stopper = EarlyStopper()
         self.train_history = {"train_loss":[], "val_accuracy_top1":[], "val_accuracy_top3":[]}
+        self.current_epoch = 0
 
     def train(self, checkpoint_filename):
         for epoch in range(self.max_epochs):
+            self.current_epoch = epoch
             train_losses = []
             for i, data in enumerate((pbar := tqdm(self.train_dataloader))):
                 # Train network
@@ -142,6 +135,28 @@ class ClassifierTrainer(BaseTrainer):
     def compute_loss(self, images, labels):
         outputs = self.model(images)
         return self.loss_function(outputs, labels)
+
+def TripletTrainer(BaseTrainer):
+    """
+        Trainer class for Triplet Margin Loss
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Start training with easy positives and semi-hard negatives
+        self.positive_policy = "easy"
+        self.negative_policy = "semi-hard"
+        self.hard_negatives_epoch = 10 # At which epoch to switch to hard negatives
+        self.hard_positives_epoch = 25 # At which epoch to switch to hard positives
+
+    def set_mining_policy(self, epoch):
+        if epoch >= self.hard_negatives_epoch:
+            self.negative_policy = "hard"
+        if epoch >= self.hard_positives_epoch:
+            self.positive_policy = "hard"
+
+    def compute_loss(self, images, labels):
+        # Set mining policy and compute loss
+        pass
 
 def train_classifier(model, train_dataloader, val_dataloader, loss_function, optimizer, epochs, device):
     train_history = {"train_loss":[], "train_accuracy":[], "val_loss":[], "val_accuracy":[]}
