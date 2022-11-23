@@ -58,7 +58,7 @@ class BaseTrainer:
                     if self.early_stopper(val_accuracy):
                         print(f"Early stopped at epoch {epoch}")
                         return
-                    pbar_str = f"Epoch {epoch}/{self.max_epochs} | Train Loss = {mean_train_loss:.4f} | Val Acc. = {100*val_accuracy:.2f}%"
+                    pbar_str = f"Epoch {epoch:02}/{self.max_epochs:02} | Train Loss = {mean_train_loss:.4f} | Val Acc. = {100*val_accuracy:.2f}% | ES {self.early_stopper.counter:02}/{self.early_stopper.limit:02}"
                     pbar.set_description(pbar_str)
                     model.train()
                     
@@ -115,8 +115,10 @@ class BaseTrainer:
         plt.savefig(filename)
 
 class SimCLRTrainer(BaseTrainer):
+    """
+        Trainer class for SimCLR self-supervised learning
+    """
     def compute_loss(self, images, labels):
-        #SimCLR forward pass and compute loss
         RAM = RandomAugmentationModule()
         t1 = RAM.generate_transform()
         t2 = RAM.generate_transform()
@@ -126,6 +128,20 @@ class SimCLRTrainer(BaseTrainer):
         z2 = self.model(v2)
         return self.loss_function(z1, z2)
 
+class XFaceTrainer(BaseTrainer):
+    """
+        Trainer class for ArcFace, CosFace and SphereFace
+    """
+    def compute_loss(self, images, labels):
+        pass
+
+class ClassifierTrainer(BaseTrainer):
+    """
+        Trainer class for Softmax classifier
+    """
+    def compute_loss(self, images, labels):
+        outputs = self.model(images)
+        return self.loss_function(outputs, labels)
 
 def train_classifier(model, train_dataloader, val_dataloader, loss_function, optimizer, epochs, device):
     train_history = {"train_loss":[], "train_accuracy":[], "val_loss":[], "val_accuracy":[]}

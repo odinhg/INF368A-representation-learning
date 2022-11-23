@@ -7,7 +7,7 @@ from configfile import *
 from utilities import save_train_plot, save_loss_plot
 from dataloader import FlowCamDataLoader
 from trainer import train_classifier, train_triplet, train_arcface, train_simclr
-from trainer import SimCLRTrainer
+from trainer import SimCLRTrainer, ClassifierTrainer
 from torchsummary import summary
 
 if __name__ == "__main__":
@@ -26,5 +26,8 @@ if __name__ == "__main__":
         trainer.train(checkpoint_filename=join(checkpoints_path, "best.pth"))
         trainer.save_plot(join(figs_path, "training_plot.png"))
     else:
-        train_history = train_classifier(model, train_dataloader, val_dataloader, loss_function, optimizer, epochs, device)
-        save_train_plot(join(figs_path, "training_plot.png"), train_history)
+        trainer = ClassifierTrainer(model, train_dataloader, val_dataloader, loss_function, optimizer, epochs, device)
+        trainer.train(checkpoint_filename=join(checkpoints_path, "best.pth"))
+        trainer.save_plot(join(figs_path, "training_plot.png"))
+        #train_history = train_classifier(model, train_dataloader, val_dataloader, loss_function, optimizer, epochs, device)
+        #save_train_plot(join(figs_path, "training_plot.png"), train_history)
