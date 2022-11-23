@@ -50,7 +50,7 @@ def save_distance_figure(distances, class_names, filename):
     # Save average distances to distance matrix plot
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    cax = ax.matshow(distances, interpolation="nearest")
+    cax = ax.matshow(distances, interpolation="nearest", cmap=plt.cm.inferno)
     fig.colorbar(cax)
     #ax.set_xticklabels([''] + class_names, rotation=45, ha="left")
     #ax.set_yticklabels([''] + class_names)
@@ -79,17 +79,17 @@ def save_embeddings(backbone, class_idx, dataloader, filename, device):
     print(f"Dataframe ({df.shape[0]} x {df.shape[1]}) saved to {filename}")
 
 class EarlyStopper():
-    def __init__(self, limit = 12, min_change = 0):
+    def __init__(self, limit = 10, min_change = 2.0):
         self.limit = limit
         self.min_change = min_change
-        self.min_loss = np.inf
+        self.max_accuracy = 0
         self.counter = 0
 
-    def __call__(self, validation_loss):
-        if validation_loss < self.min_loss:
-            self.min_loss = validation_loss
+    def __call__(self, validation_accuracy):
+        if validation_accuracy > self.max_accuracy:
+            self.max_accuracy = validation_accuracy
             self.counter = 0
-        elif validation_loss > self.min_loss + self.min_change:
+        elif validation_accuracy < self.max_accuracy - self.min_change:
             self.counter += 1
             if self.counter >= self.limit:
                 return True

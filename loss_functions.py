@@ -56,7 +56,8 @@ class AngularMarginLoss(nn.Module):
         self.cross_entropy_loss = nn.CrossEntropyLoss(reduction="mean")
 
     def forward(self, embeddings, weights, labels):
-        # Note: Embeddings and weights are assumed to be l2-normalized before passed to this loss function!
+        embeddings = nn.functional.normalize(embeddings, p=2, dim=1) #L2-normalize embeddings
+        weights = nn.functional.normalize(weights, p=2, dim=1) #L2-normalize weights
         device = embeddings.device
         self.m.to(device)
         self.s.to(device)
@@ -72,7 +73,7 @@ class NTXentLoss(nn.Module):
     # Normalized Temperature-scaled Cross Entropy Loss for SimCLR
     def __init__(self, t):
         super().__init__()
-        self.t = torch.tensor(t) # Temperature
+        self.t = torch.tensor(t) # Temperature hyper-parameter
 
     def forward(self, z1, z2):
         device = z1.device

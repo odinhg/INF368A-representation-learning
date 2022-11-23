@@ -31,6 +31,7 @@ class ConvBlock(nn.Module):
 class ClassifierHead(nn.Module):
     """
         For use with SoftMax classifier and ArcFace (or other classifier-based methods)
+        Also used for validation during training
     """
     def __init__(self, embedding_dimension, number_of_classes):
         super().__init__()
@@ -43,12 +44,9 @@ class ClassifierHead(nn.Module):
         x = self.layers(x)
         return x
 
-    def get_weights(self, normalize=True):
+    def get_weights(self):
         # Used to compute Angular Margin Loss when training ArcFace
-        weights = self.layers[0].weight
-        if normalize:
-            return nn.functional.normalize(weights, p=2, dim=1) #L2-normalize weights
-        return weights 
+        return self.layers[0].weight
 
 class ProjectionHead(nn.Module):
     """
