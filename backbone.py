@@ -10,17 +10,17 @@ def init_weights(m):
         m.bias.data.fill_(0.01)
 
 class ConvBlock(nn.Module):
-    def __init__(self):
+    def __init__(self, depth=64):
         super().__init__()
         self.layers = nn.Sequential(
                     nn.Conv2d(
-                        in_channels=64,
-                        out_channels=64,
+                        in_channels=depth,
+                        out_channels=depth,
                         kernel_size=3,
                         stride=1,
                         padding=1
                         ),
-                    nn.BatchNorm2d(64),
+                    nn.BatchNorm2d(depth),
                     nn.ReLU()
         )
         self.layers.apply(init_weights)

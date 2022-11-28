@@ -126,7 +126,10 @@ class XFaceTrainer(BaseTrainer):
         Trainer class for ArcFace, CosFace and SphereFace
     """
     def compute_loss(self, images, labels):
-        pass
+        embeddings = self.model[0](images)
+        outputs = self.model[1](embeddings)
+        weights = self.model[1].get_weights()
+        return self.loss_function(embeddings, weights, labels)
 
 class ClassifierTrainer(BaseTrainer):
     """
