@@ -139,12 +139,12 @@ class ClassifierTrainer(BaseTrainer):
         outputs = self.model(images)
         return self.loss_function(outputs, labels)
 
-def TripletTrainer(BaseTrainer):
+class TripletTrainer(BaseTrainer):
     """
         Trainer class for Triplet Margin Loss
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(TripletTrainer, self).__init__(*args, **kwargs)
         # Start training with easy positives and semi-hard negatives
         self.positive_policy = "easy"
         self.negative_policy = "semi-hard"
@@ -158,8 +158,10 @@ def TripletTrainer(BaseTrainer):
             self.positive_policy = "hard"
 
     def compute_loss(self, images, labels):
-        # Set mining policy and compute loss
-        pass
+        # Set mining policy based on epoch and compute loss
+        self.set_mining_policy(self.current_epoch)
+        outputs = model(images)
+        return self.loss_function(outputs, labels, self.negative_policy, self.positive_policy)
 
 def train_classifier(model, train_dataloader, val_dataloader, loss_function, optimizer, epochs, device):
     train_history = {"train_loss":[], "train_accuracy":[], "val_loss":[], "val_accuracy":[]}
