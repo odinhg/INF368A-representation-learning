@@ -6,6 +6,7 @@ from os.path import isfile, join, exists
 from dataloader import FlowCamDataLoader
 from backbone import BackBone, ClassifierHead, ProjectionHead
 from loss_functions import TripletLoss, AngularMarginLoss, NTXentLoss
+from trainer import SimCLRTrainer, ClassifierTrainer, XFaceTrainer, TripletTrainer
 
 torch.manual_seed(0)
 
@@ -48,18 +49,22 @@ if model_type == "triplet":
     # Triplet Margin Loss Model
     loss_function = TripletLoss(margin=margin)
     head = None
+    trainer = TripletTrainer()
 elif model_type == "arcface":
     # Angular Margin Loss Model
     loss_function = AngularMarginLoss(m=margin, s=scale, number_of_classes=number_of_classes)
-    head = ClassifierHead(embedding_dimension, number_of_classes) 
+    head = ClassifierHead(embedding_dimension, number_of_classes)
+    trainer = XFaceTrainer()
 elif model_type == "simclr":
     # SimCLR based Model
     loss_function = NTXentLoss(t=temperature)
     head = ProjectionHead(embedding_dimension)
+    trainer = SimCLRTrainer()
 else:
     # Classic SoftMax Classifier Model
     loss_function = nn.CrossEntropyLoss()
-    head = ClassifierHead(embedding_dimension, number_of_classes) 
+    head = ClassifierHead(embedding_dimension, number_of_classes)
+    trainer = ClassifierTrainer()
 
 if head:
     model = nn.Sequential(backbone, head)
@@ -69,6 +74,8 @@ else:
 optimizer = optim.Adam(model.parameters(), lr=lr)
 
 device = torch.device('cuda:4') 
+
+trainer.init(model, train_dataloader, val_dataloader, loss_function, optimizer, epochs, device)
 
 config_name = configfiles[idx]
 embeddings_path = join("embeddings", config_name)

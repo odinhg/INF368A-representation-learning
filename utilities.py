@@ -79,7 +79,7 @@ def save_embeddings(backbone, class_idx, dataloader, filename, device):
     print(f"Dataframe ({df.shape[0]} x {df.shape[1]}) saved to {filename}")
 
 class EarlyStopper():
-    def __init__(self, limit = 15, min_change = 0.02):
+    def __init__(self, limit = 15, min_change = 0.025):
         self.limit = limit
         self.min_change = min_change
         self.max_accuracy = 0

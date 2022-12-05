@@ -46,15 +46,20 @@ class TripletLoss(nn.Module):
 
         return triplet_loss / number_of_triplets_mined
 
-class AngularMarginLoss(nn.Module):
-    # Simple implementation of Angular Margin Loss for ArcFace
+class FaceLoss(nn.Module):
     def __init__(self, m, s, number_of_classes):
         super().__init__()
         self.m = torch.tensor(m)
         self.s = torch.tensor(s)
         self.number_of_classes = number_of_classes
         self.cross_entropy_loss = nn.CrossEntropyLoss(reduction="mean")
+    
+    def forward(self, embeddings, weights, labels):
+        pass
 
+
+class AngularMarginLoss(FaceLoss):
+    # Implementation of Angular Margin Loss for ArcFace
     def forward(self, embeddings, weights, labels):
         embeddings = nn.functional.normalize(embeddings, p=2, dim=1) #L2-normalize embeddings
         weights = nn.functional.normalize(weights, p=2, dim=1) #L2-normalize weights
@@ -66,6 +71,21 @@ class AngularMarginLoss(nn.Module):
         # Using one-hot to add margin only to ground truth
         margin = self.m * torch.nn.functional.one_hot(labels, num_classes=self.number_of_classes)
         logits = self.s * torch.cos(theta + margin)
+        loss = self.cross_entropy_loss(logits, labels)
+        return loss
+
+class LargeMarginCosineLoss(FaceLoss):
+    # Implementation of LMCL for CosFace
+    def forward(self, embeddings, weights, labels):
+        embeddings = nn.functional.normalize(embeddings, p=2, dim=1) #L2-normalize embeddings
+        weights = nn.functional.normalize(weights, p=2, dim=1) #L2-normalize weights
+        device = embeddings.device
+        self.m.to(device)
+        self.s.to(device)
+        cos_theta = torch.matmul(embeddings, weights.t())
+        # Using one-hot to add margin only to ground truth
+        margin = self.m * torch.nn.functional.one_hot(labels, num_classes=self.number_of_classes)
+        logits = self.s * (cos_theta - margin)
         loss = self.cross_entropy_loss(logits, labels)
         return loss
 
