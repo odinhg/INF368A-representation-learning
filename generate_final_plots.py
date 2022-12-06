@@ -18,5 +18,5 @@ for model in models.keys():
 val_plot = val_accuracies.plot(title="Validation accuracy (Seen data)", xlabel="Steps", ylabel="Accuracy [%]").get_figure()
 val_plot.savefig("figs/val_acc_all.png")
 
-test_plot = val_accuracies.plot(title="Test accuracy (Unseen data)", xlabel="Training dataset size", ylabel="Accuracy [%]").get_figure()
+test_plot = test_accuracies.plot(title="Test accuracy (Unseen data)", xlabel="Training dataset size", ylabel="Accuracy [%]").get_figure()
 test_plot.savefig("figs/test_acc_all.png")
