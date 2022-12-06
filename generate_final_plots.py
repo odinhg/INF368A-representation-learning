@@ -5,6 +5,7 @@ from os.path import join, isfile
 
 val_accuracies = pd.DataFrame()
 test_accuracies = pd.DataFrame()
+test_accuracies["Dataset size"] = [n for n in range(5,101,5)]
 
 for model in models.keys():
     figspath = join("figs", model)
@@ -18,6 +19,5 @@ for model in models.keys():
 val_plot = val_accuracies.plot(title="Validation accuracy (Seen data)", xlabel="Steps", ylabel="Accuracy [%]").get_figure()
 val_plot.savefig("figs/val_acc_all.png")
 
-fractions = [n for n in range(5,101,5)]
-test_plot = test_accuracies.plot(title="Test accuracy (Unseen data)", xlabel="Training data used [%]", xticks=fractions, ylabel="Accuracy [%]").get_figure()
+test_plot = test_accuracies.plot(x="Dataset size", title="Test accuracy (Unseen data)", xlabel="Training data used [%]", ylabel="Accuracy [%]").get_figure()
 test_plot.savefig("figs/test_acc_all.png")
