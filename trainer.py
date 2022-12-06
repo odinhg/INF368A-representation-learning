@@ -144,8 +144,8 @@ class TripletTrainer(BaseTrainer):
         # Start training with easy positives and semi-hard negatives
         self.positive_policy = "easy"
         self.negative_policy = "semi-hard"
-        self.hard_negatives_epoch = 10 # At which epoch to switch to hard negatives
-        self.hard_positives_epoch = 25 # At which epoch to switch to hard positives
+        self.hard_negatives_epoch = 5 # At which epoch to switch to hard negatives
+        self.hard_positives_epoch = 15 # At which epoch to switch to hard positives
 
     def set_mining_policy(self, epoch):
         if epoch >= self.hard_negatives_epoch:

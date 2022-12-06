@@ -36,7 +36,7 @@ models["SimCLR"] = {
         "head" : ProjectionHead(embedding_dimension),
         "loss_function" : NTXentLoss(t=0.1),
         "trainer" : SimCLRTrainer(),
-        "batch_size" : 256,
+        "batch_size" : 512,
         "epochs" : 50,
         "lr" : 0.0015
         }
