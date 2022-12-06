@@ -103,6 +103,11 @@ class BaseTrainer:
         fig.tight_layout()
         plt.savefig(filename)
 
+    def save_train_history(self, filename):
+        # Save loss and accuracy history to pickled dataframe for later use
+        df = pd.DataFrame.from_dict(self.train_history)
+        df.to_pickle(filename)
+
 class SimCLRTrainer(BaseTrainer):
     """
         Trainer class for SimCLR self-supervised learning

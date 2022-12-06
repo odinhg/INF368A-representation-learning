@@ -15,3 +15,4 @@ if __name__ == "__main__":
     print(f"Training model: {config_name}")
     trainer.train(checkpoint_filename=join(checkpoints_path, "best.pth"))
     trainer.save_plot(join(figs_path, "training_plot.png"))
+    trainer.save_train_history(join(figs_path, "train_history.pkl"))

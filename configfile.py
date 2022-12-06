@@ -16,7 +16,6 @@ test = 0.00
 image_size = (128, 128)
 embedding_dimension = 128
 backbone = BackBone(embedding_dimension)
-device = torch.device('cuda:4') 
 
 # Dataset selection 
 class_names_all = ["artefact","Bacillariophyceae","cyano a","Chaetoceros","dark","light","Melosiraceae","nauplii","Neoceratium pentagonum", "detritus", "contrasted_blob", "Dinophyceae", "Coscinodiscaceae", "part<Crustacea", "fiber", "lightrods", "lightsphere", "darksphere", "cyano b", "chainthin"]
@@ -36,9 +35,10 @@ models["SimCLR"] = {
         "head" : ProjectionHead(embedding_dimension),
         "loss_function" : NTXentLoss(t=0.1),
         "trainer" : SimCLRTrainer(),
-        "batch_size" : 512,
-        "epochs" : 50,
-        "lr" : 0.0015
+        "batch_size" : 1024,
+        "epochs" : 20,
+        "lr" : 0.0015,
+        "device" : "cuda:3"
         }
 
 # Triplet Margin Loss Model
@@ -47,8 +47,9 @@ models["TripletMarginLoss"] = {
         "loss_function" : TripletLoss(margin=0.5),
         "trainer" : TripletTrainer(),
         "batch_size" : 128,
-        "epochs" : 50,
-        "lr" : 0.0015
+        "epochs" : 20,
+        "lr" : 0.0015,
+        "device" : "cuda:4"
         }
 
 # ArcFace Model
@@ -57,8 +58,9 @@ models["ArcFace"] = {
         "loss_function" : AngularMarginLoss(m=0.5, s=64, number_of_classes=number_of_classes),
         "trainer" : XFaceTrainer(),
         "batch_size" : 128,
-        "epochs" : 50,
-        "lr" : 0.0015
+        "epochs" : 20,
+        "lr" : 0.0015,
+        "device" : "cuda:5"
         }
 
 # CosFace Model
@@ -67,8 +69,9 @@ models["CosFace"] = {
         "loss_function" : LargeMarginCosineLoss(m=0.5, s=64, number_of_classes=number_of_classes),
         "trainer" : XFaceTrainer(),
         "batch_size" : 128,
-        "epochs" : 50,
-        "lr" : 0.0015
+        "epochs" : 20,
+        "lr" : 0.0015,
+        "device" : "cuda:6"
         }
 
 # Standard Softmax Classifier Model
@@ -77,8 +80,9 @@ models["Softmax"] = {
         "loss_function" : nn.CrossEntropyLoss(),
         "trainer" : ClassifierTrainer(),
         "batch_size" : 128,
-        "epochs" : 50,
-        "lr" : 0.0015
+        "epochs" : 20,
+        "lr" : 0.0015,
+        "device" : "cuda:7"
         }
 
 # Select and load model
@@ -89,6 +93,7 @@ choice = int(input("Choose model: "))
 config_name = model_names[choice]
 selected_model = models[config_name]
 
+device = torch.device(selected_model["device"]) 
 head = selected_model["head"]
 loss_function = selected_model["loss_function"]
 trainer = selected_model["trainer"]

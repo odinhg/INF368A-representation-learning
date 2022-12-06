@@ -19,6 +19,6 @@ if __name__ == "__main__":
     backbone.load_state_dict(torch.load(join(checkpoints_path, "best.pth")))
     
     print("Embedding data.")
-    save_embeddings(backbone, class_idx, train_dataloader, embeddings_file_train, device)
+    #save_embeddings(backbone, class_idx, train_dataloader, embeddings_file_train, device)
     #save_embeddings(backbone, class_idx, test_dataloader, embeddings_file_test, device)
     save_embeddings(backbone, class_idx_unseen, unseen_dataloader, embeddings_file_unseen, device)
