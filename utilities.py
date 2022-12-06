@@ -113,6 +113,9 @@ def save_accuracy_plot(accuracies, n_samples, method, figs_path):
     filename = join(figs_path, filename)
     plt.savefig(filename)
     print(f"Saved plot to {filename}.")
+    # Also save accuracies to Pandas DataFrame for later use
+    df = pd.DataFrame({"n_samples" : n_samples, "accuracy" : accuracies})
+    df.to_pickle(join(figs_path, "svc_accuracies.pkl"))
 
 class RandomAugmentationModule:
     """

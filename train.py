@@ -12,6 +12,6 @@ from torchsummary import summary
 if __name__ == "__main__":
     summary(model, (3, *image_size), device=device)
     model.to(device)
-    print(f"Training model: {model_type}")
+    print(f"Training model: {config_name}")
     trainer.train(checkpoint_filename=join(checkpoints_path, "best.pth"))
     trainer.save_plot(join(figs_path, "training_plot.png"))

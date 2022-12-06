@@ -9,11 +9,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import top_k_accuracy_score
-from sklearn.neural_network import MLPClassifier
-from sklearn.linear_model import SGDClassifier
-from sklearn.calibration import CalibratedClassifierCV
-from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import top_k_accuracy_score, balanced_accuracy_score
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 
@@ -31,7 +27,7 @@ class BaseTrainer:
         self.device = device
         self.val_steps = len(self.train_dataloader) // 5
         self.early_stopper = EarlyStopper()
-        self.train_history = {"train_loss":[], "val_accuracy_top1":[], "val_accuracy_top3":[]}
+        self.train_history = {"train_loss":[], "val_accuracy":[]}
         self.current_epoch = 0
 
     def train(self, checkpoint_filename):
@@ -49,7 +45,7 @@ class BaseTrainer:
                     train_losses = []
                     self.model.eval()
                     val_accuracy = self.validate()
-                    if val_accuracy >= np.max(self.train_history["val_accuracy_top1"]):
+                    if val_accuracy >= np.max(self.train_history["val_accuracy"]):
                         torch.save(self.model[0].state_dict(), checkpoint_filename)
                     if self.early_stopper(val_accuracy):
                         print(f"Early stopped at epoch {epoch}")
@@ -86,23 +82,20 @@ class BaseTrainer:
         labels = pd.Series(labels)
         X_train, X_test, y_train, y_test = train_test_split(embeddings, labels, test_size=0.35, random_state=420)
 
-        # Train validation classifier on embeddings and compute accuracies
+        # Train simple SVC validation classifier on embeddings and compute accuracies
         val_classifier = make_pipeline(StandardScaler(), SVC(gamma="auto", probability=True))
         val_classifier.fit(X_train, y_train)
-        y_pred_proba = val_classifier.predict_proba(X_test)
-        accuracy_top1 = top_k_accuracy_score(y_test, y_pred_proba, k=1)
-        accuracy_top3 = top_k_accuracy_score(y_test, y_pred_proba, k=3)
-        self.train_history["val_accuracy_top1"].append(accuracy_top1)
-        self.train_history["val_accuracy_top3"].append(accuracy_top3)
+        y_pred = val_classifier.predict(X_test)
+        accuracy_balanced = balanced_accuracy_score(y_test, y_pred)
+        self.train_history["val_accuracy"].append(accuracy_balanced)
         
-        return accuracy_top1
+        return accuracy_balanced
 
     def save_plot(self, filename):
         # Plot losses and accuracies from training
         fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 6))
         axes[0].plot(self.train_history["train_loss"], 'b', label="Train Loss")
-        axes[1].plot(self.train_history["val_accuracy_top1"], 'b', label="Top-1 Validation Accuracy")
-        axes[1].plot(self.train_history["val_accuracy_top3"], 'g', label="Top-3 Validation Accuracy")
+        axes[1].plot(self.train_history["val_accuracy"], 'b', label="Validation Accuracy (Balanced)")
         axes[0].title.set_text('Loss')
         axes[1].title.set_text('Accuracy')
         axes[0].legend(loc="upper right")
