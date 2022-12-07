@@ -40,7 +40,20 @@ models["SimCLR"] = {
         "batch_size" : 1024,
         "epochs" : 20,
         "lr" : 0.0015,
-        "device" : "cuda:3"
+        "device" : "cuda:3",
+        "balance_train_data" : False
+        }
+
+# SimCLR Model (With balanced dataloader)
+models["BalancedSimCLR"] = {
+        "head" : ProjectionHead(embedding_dimension),
+        "loss_function" : NTXentLoss(t=0.2),
+        "trainer" : SimCLRTrainer(),
+        "batch_size" : 1024,
+        "epochs" : 20,
+        "lr" : 0.0015,
+        "device" : "cuda:3",
+        "balance_train_data" : False
         }
 
 # Triplet Margin Loss Model
@@ -51,7 +64,8 @@ models["TripletMarginLoss"] = {
         "batch_size" : 128,
         "epochs" : 20,
         "lr" : 0.0015,
-        "device" : "cuda:4"
+        "device" : "cuda:4",
+        "balance_train_data" : False
         }
 
 # ArcFace Model
@@ -62,7 +76,8 @@ models["ArcFace"] = {
         "batch_size" : 128,
         "epochs" : 20,
         "lr" : 0.0015,
-        "device" : "cuda:5"
+        "device" : "cuda:5",
+        "balance_train_data" : False
         }
 
 # CosFace Model
@@ -73,7 +88,8 @@ models["CosFace"] = {
         "batch_size" : 128,
         "epochs" : 20,
         "lr" : 0.0015,
-        "device" : "cuda:6"
+        "device" : "cuda:6",
+        "balance_train_data" : False
         }
 
 # Standard Softmax Classifier Model
@@ -84,7 +100,8 @@ models["Softmax"] = {
         "batch_size" : 128,
         "epochs" : 20,
         "lr" : 0.0015,
-        "device" : "cuda:7"
+        "device" : "cuda:7",
+        "balance_train_data" : False
         }
 
 # Select and load model
@@ -102,6 +119,7 @@ trainer = selected_model["trainer"]
 batch_size = selected_model["batch_size"]
 epochs = selected_model["epochs"]
 lr = selected_model["lr"]
+balance_train_data = selected_model["balance_train_data"]
 
 #Load custom dataset
 #data = FlowCamDataLoader(class_names, image_size, val, test,  batch_size)
@@ -113,7 +131,12 @@ lr = selected_model["lr"]
 #val_dataset = data["val_dataset"]
 #test_dataset = data["test_dataset"]
 train_dataset = FlowCamDataSet(class_names, image_size)
-train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+if balance_train_data:
+    sample_weights = train_dataset.get_sample_weights()
+    sampler = torch.utils.data.WeightedRandomSampler(weights=sample_weights, num_samples=len(sample_weights), replacement=True)
+else:
+    sampler = None
+train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, sampler=sampler)
 
 val_dataset = FlowCamDataSet(validation_classes, image_size)
 val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)

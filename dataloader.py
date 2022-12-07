@@ -29,6 +29,13 @@ class FlowCamDataSet(Dataset):
         for class_name, class_size in self.class_sizes:
             print(f"\"{class_name}\": {class_size} images ({round(100*class_size/self.number_of_images, 2)}%).")
         print(f"Total: {self.number_of_images} images.")
+    
+    def get_sample_weights(self):
+        sample_weights = []
+        for i,(class_name, class_size) in enumerate(self.class_sizes):
+            sample_weights += [self.number_of_images/class_size] * class_size
+        return sample_weights
+
 
     def __getitem__(self, index):
         filename, label = self.images[index]
