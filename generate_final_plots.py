@@ -12,7 +12,7 @@ for model in models.keys():
     train_history_filename = join(figspath, "train_history.pkl")
     accuracies_filename = join(figspath, "svc_accuracies.pkl")
     if isfile(train_history_filename):
-        val_accuracies[model] = pd.read_pickle(train_history_filename)["val_accuracy"].rolling(3, min_periods=1).mean()
+        val_accuracies[model] = pd.read_pickle(train_history_filename)["val_accuracy"].rolling(5, min_periods=1).mean()
     if isfile(accuracies_filename):
         test_accuracies[model] = pd.read_pickle(accuracies_filename)["accuracy"]
 
