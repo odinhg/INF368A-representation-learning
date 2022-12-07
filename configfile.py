@@ -35,7 +35,7 @@ models = {}
 # SimCLR Model
 models["SimCLR"] = {
         "head" : ProjectionHead(embedding_dimension),
-        "loss_function" : NTXentLoss(t=0.1),
+        "loss_function" : NTXentLoss(t=0.05),
         "trainer" : SimCLRTrainer(),
         "batch_size" : 1024,
         "epochs" : 20,
@@ -46,7 +46,7 @@ models["SimCLR"] = {
 # Triplet Margin Loss Model
 models["TripletMarginLoss"] = {
         "head" : None,
-        "loss_function" : TripletLoss(margin=0.5),
+        "loss_function" : TripletLoss(margin=0.2),
         "trainer" : TripletTrainer(),
         "batch_size" : 128,
         "epochs" : 20,
