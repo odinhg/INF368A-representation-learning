@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from os import listdir, makedirs
 from os.path import isfile, join, exists
-from dataloader import FlowCamDataLoader
+from dataloader import FlowCamDataLoader, FlowCamDataSet
 from backbone import BackBone, ClassifierHead, ProjectionHead
 from loss_functions import TripletLoss, AngularMarginLoss, NTXentLoss, LargeMarginCosineLoss
 from trainer import SimCLRTrainer, ClassifierTrainer, XFaceTrainer, TripletTrainer
@@ -11,11 +11,10 @@ from trainer import SimCLRTrainer, ClassifierTrainer, XFaceTrainer, TripletTrain
 torch.manual_seed(0)
 
 # Global settings (for all models)
-val = 0.05
-test = 0.00 
 image_size = (128, 128)
 embedding_dimension = 128
 backbone = BackBone(embedding_dimension)
+num_workers = 8
 
 # Dataset selection 
 class_names_all = ["artefact","Bacillariophyceae","cyano a","Chaetoceros","dark","light","Melosiraceae","nauplii","Neoceratium pentagonum", "detritus", "contrasted_blob", "Dinophyceae", "Coscinodiscaceae", "part<Crustacea", "fiber", "lightrods", "lightsphere", "darksphere", "cyano b", "chainthin"]
@@ -26,6 +25,9 @@ class_idx_unseen = list(range(number_of_classes_total - number_of_unseen_classes
 class_names = [class_names_all[i] for i in class_idx]
 class_names_unseen = [class_names_all[i] for i in class_idx_unseen]
 number_of_classes = len(class_names)
+
+# Small dataset for training validation support vector classifier
+validation_classes = ["Hemiaulus", "Gymnodiniales", "Copepoda", "Dictyocysta", "Spumellaria", "Foraminifera", "Ornithocercus"]
 
 # Model specific configurations
 models = {}
@@ -55,7 +57,7 @@ models["TripletMarginLoss"] = {
 # ArcFace Model
 models["ArcFace"] = {
         "head" : ClassifierHead(embedding_dimension, number_of_classes),
-        "loss_function" : AngularMarginLoss(m=0.5, s=64, number_of_classes=number_of_classes),
+        "loss_function" : AngularMarginLoss(m=0.1, s=64, number_of_classes=number_of_classes),
         "trainer" : XFaceTrainer(),
         "batch_size" : 128,
         "epochs" : 20,
@@ -66,7 +68,7 @@ models["ArcFace"] = {
 # CosFace Model
 models["CosFace"] = {
         "head" : ClassifierHead(embedding_dimension, number_of_classes),
-        "loss_function" : LargeMarginCosineLoss(m=0.5, s=64, number_of_classes=number_of_classes),
+        "loss_function" : LargeMarginCosineLoss(m=0.1, s=64, number_of_classes=number_of_classes),
         "trainer" : XFaceTrainer(),
         "batch_size" : 128,
         "epochs" : 20,
@@ -102,14 +104,20 @@ epochs = selected_model["epochs"]
 lr = selected_model["lr"]
 
 #Load custom dataset
-data = FlowCamDataLoader(class_names, image_size, val, test,  batch_size)
-train_dataloader = data["train_dataloader"]
-val_dataloader = data["val_dataloader"]
-test_dataloader = data["test_dataloader"]
-train_dataset = data["train_dataset"]
-val_dataset = data["val_dataset"]
-test_dataset = data["test_dataset"]
-    
+#data = FlowCamDataLoader(class_names, image_size, val, test,  batch_size)
+#train_dataloader = FlowCamDataLoader(class_names, image_size, val, test,  batch_size, split=False)
+#train_dataloader = data["train_dataloader"]
+#val_dataloader = data["val_dataloader"]
+#test_dataloader = data["test_dataloader"]
+#train_dataset = data["train_dataset"]
+#val_dataset = data["val_dataset"]
+#test_dataset = data["test_dataset"]
+train_dataset = FlowCamDataSet(class_names, image_size)
+train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+
+val_dataset = FlowCamDataSet(validation_classes, image_size)
+val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+
 # Assemble backbone and head
 if head:
     model = nn.Sequential(backbone, head)

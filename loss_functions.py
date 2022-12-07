@@ -46,19 +46,14 @@ class TripletLoss(nn.Module):
 
         return triplet_loss / number_of_triplets_mined
 
-class FaceLoss(nn.Module):
+class AngularMarginLoss(nn.Module):
     def __init__(self, m, s, number_of_classes):
         super().__init__()
         self.m = torch.tensor(m)
         self.s = torch.tensor(s)
         self.number_of_classes = number_of_classes
         self.cross_entropy_loss = nn.CrossEntropyLoss(reduction="mean")
-    
-    def forward(self, embeddings, weights, labels):
-        pass
 
-
-class AngularMarginLoss(FaceLoss):
     # Implementation of Angular Margin Loss for ArcFace
     def forward(self, embeddings, weights, labels):
         embeddings = nn.functional.normalize(embeddings, p=2, dim=1) #L2-normalize embeddings
@@ -74,7 +69,14 @@ class AngularMarginLoss(FaceLoss):
         loss = self.cross_entropy_loss(logits, labels)
         return loss
 
-class LargeMarginCosineLoss(FaceLoss):
+class LargeMarginCosineLoss(nn.Module):
+    def __init__(self, m, s, number_of_classes):
+        super().__init__()
+        self.m = torch.tensor(m)
+        self.s = torch.tensor(s)
+        self.number_of_classes = number_of_classes
+        self.cross_entropy_loss = nn.CrossEntropyLoss(reduction="mean")
+
     # Implementation of LMCL for CosFace
     def forward(self, embeddings, weights, labels):
         embeddings = nn.functional.normalize(embeddings, p=2, dim=1) #L2-normalize embeddings

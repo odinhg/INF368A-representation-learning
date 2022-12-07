@@ -80,10 +80,10 @@ class BaseTrainer:
         # Split validation data into train and test
         embeddings = pd.DataFrame(embeddings)
         labels = pd.Series(labels)
-        X_train, X_test, y_train, y_test = train_test_split(embeddings, labels, test_size=0.35, random_state=420)
+        X_train, X_test, y_train, y_test = train_test_split(embeddings, labels, test_size=0.35) #, random_state=420)
 
         # Train simple SVC validation classifier on embeddings and compute accuracies
-        val_classifier = make_pipeline(StandardScaler(), SVC(gamma="auto", probability=True))
+        val_classifier = make_pipeline(StandardScaler(), SVC(gamma="auto"))
         val_classifier.fit(X_train, y_train)
         y_pred = val_classifier.predict(X_test)
         accuracy_balanced = balanced_accuracy_score(y_test, y_pred)
