@@ -17,7 +17,9 @@ backbone = BackBone(embedding_dimension)
 num_workers = 8
 
 # Dataset selection 
-class_names_all = ["artefact","Bacillariophyceae","cyano a","Chaetoceros","dark","light","Melosiraceae","nauplii","Neoceratium pentagonum", "detritus", "contrasted_blob", "Dinophyceae", "Coscinodiscaceae", "part<Crustacea", "fiber", "lightrods", "lightsphere", "darksphere", "cyano b", "chainthin"]
+#class_names_all = ["artefact","Bacillariophyceae","cyano a","Chaetoceros","dark","light","Melosiraceae","nauplii","Neoceratium pentagonum", "detritus", "contrasted_blob", "Dinophyceae", "Coscinodiscaceae", "part<Crustacea", "fiber", "lightrods", "lightsphere", "darksphere", "cyano b", "chainthin"]
+class_names_all = ["Bacteriastrum", "Nassellaria", "Richelia", "Climacodium", "crumple sphere", "other<living", "Neoceratium fusus", "Protoperidinium", "Eutintinnus", "Undellidae", "UCYNA like", "ball_bearing_like", "Rhizosolenia inter. Richelia", "Ditylum", "darkrods", "Thalassionematales", "pennate", "Rhabdonellidae", "Odontella", "Codonellopsis", "Planktoniella sol", "part<Ditylum", "Neoceratium", "Retaria", "part<Odontella", "Rhizosoleniaceae", "artefact","Bacillariophyceae","cyano a","Chaetoceros","dark","light","Melosiraceae","nauplii","Neoceratium pentagonum", "detritus", "contrasted_blob", "Dinophyceae", "Coscinodiscaceae", "part<Crustacea", "fiber", "lightrods", "lightsphere", "darksphere", "cyano b", "chainthin"]
+
 number_of_classes_total = len(class_names_all)
 number_of_unseen_classes = 10 # Set the number of classes we exclude from training data
 class_idx = list(range(0, number_of_classes_total - number_of_unseen_classes))
@@ -121,15 +123,7 @@ epochs = selected_model["epochs"]
 lr = selected_model["lr"]
 balance_train_data = selected_model["balance_train_data"]
 
-#Load custom dataset
-#data = FlowCamDataLoader(class_names, image_size, val, test,  batch_size)
-#train_dataloader = FlowCamDataLoader(class_names, image_size, val, test,  batch_size, split=False)
-#train_dataloader = data["train_dataloader"]
-#val_dataloader = data["val_dataloader"]
-#test_dataloader = data["test_dataloader"]
-#train_dataset = data["train_dataset"]
-#val_dataset = data["val_dataset"]
-#test_dataset = data["test_dataset"]
+#Load custom datasets (seen dataset and the disjoint validation dataset)
 train_dataset = FlowCamDataSet(class_names, image_size)
 if balance_train_data:
     sample_weights = train_dataset.get_sample_weights()
