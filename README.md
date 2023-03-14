@@ -1,11 +1,12 @@
 # Some models for metric and representation learning
 
 Implementations of the following models / loss functions:
-	- Standard Softmax Classifier (Cross Entropy Loss)
-	- Triplet Network (Triplet Margin Loss)
-	- ArcFace (Angular Margin Loss)
-	- CosFace (Large Margin Cosine Loss)
-	- SimCLR (Normalized Temperature-scaled Cross Entropy Loss)
+
+- Standard Softmax Classifier (Cross Entropy Loss)
+- Triplet Network (Triplet Margin Loss)
+- ArcFace (Angular Margin Loss)
+- CosFace (Large Margin Cosine Loss)
+- SimCLR (Normalized Temperature-scaled Cross Entropy Loss)
 	
 See `loss_functions.py` for implementations of loss functions. I do not claim these implementations to be optimal in any sense. See some of my other repositories for evaluation of the different models.
 
